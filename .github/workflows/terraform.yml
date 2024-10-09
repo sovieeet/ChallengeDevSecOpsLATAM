@@ -36,23 +36,28 @@ jobs:
       - name: Initialize Terraform
         env:
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: cd ./terraform && terraform init
 
       - name: Import Existing Resources
         env:
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: |
           cd ./terraform
-          terraform import google_bigquery_dataset.desafio_latam ${GCP_PROJECT_ID}:desafio_latam || echo "Dataset already managed by Terraform"
-          terraform import google_pubsub_topic.data_ingestion projects/${GCP_PROJECT_ID}/topics/data-ingestion || echo "Topic already managed by Terraform"
-          terraform import google_storage_bucket.function_bucket ${GCP_PROJECT_ID}-function-bucket || echo "Bucket already managed by Terraform"
+          echo "Importing resources into Terraform state..."
+          terraform import google_bigquery_dataset.desafio_latam "${GCP_PROJECT_ID}:desafio_latam" || echo "Dataset already managed by Terraform"
+          terraform import google_pubsub_topic.data_ingestion "projects/${GCP_PROJECT_ID}/topics/data-ingestion" || echo "Topic already managed by Terraform"
+          terraform import google_storage_bucket.function_bucket "${GCP_PROJECT_ID}-function-bucket" || echo "Bucket already managed by Terraform"
 
       - name: Terraform Plan
         env:
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: cd ./terraform && terraform plan
 
       - name: Terraform Apply
         env:
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: cd ./terraform && terraform apply -auto-approve
