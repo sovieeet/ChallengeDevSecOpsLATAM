@@ -25,6 +25,9 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Create ZIP for Cloud Function
+        run: zip ./terraform/function.zip ./terraform/pubsub.py
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
