@@ -28,7 +28,7 @@ jobs:
 
       - name: Create ZIP for Cloud Function
         run: |
-            cd challengelatam/pubsub
+            cd challengelatam
             zip -r ../../terraform/function.zip pubsub/
 
       - name: Set up Terraform
