@@ -31,10 +31,17 @@ jobs:
           terraform_wrapper: false
 
       - name: Initialize Terraform
+        env:
+          TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
         run: cd ./terraform && terraform init
 
       - name: Terraform Plan
-        run: cd ./terraform && terraform plan -var="google_credentials=${{ secrets.GCP_SA_KEY }}"
+        env:
+          TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+        run: cd ./terraform && terraform plan
 
       - name: Terraform Apply
-        run: cd ./terraform && terraform apply -auto-approve -var="google_credentials=${{ secrets.GCP_SA_KEY }}"
+        if: github.ref == 'refs/heads/main'
+        env:
+          TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+        run: cd ./terraform && terraform apply -auto-approve

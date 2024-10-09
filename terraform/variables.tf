@@ -7,7 +7,9 @@ variable "project_id" {
 variable "google_credentials" {
   description = "Google Cloud credentials JSON"
   type        = string
+  sensitive   = true
 }
+
 
 variable "region" {
   description = "Region of project"
