@@ -38,51 +38,34 @@ jobs:
 
       - name: Initialize Terraform
         env:
-            TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
-            TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
-            TF_VAR_dataset_id: ${{ secrets.DATASET_ID }}
-            TF_VAR_table_id: ${{ secrets.TABLE_ID }}
-            TF_VAR_google_service_account_email: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: cd ./terraform && terraform init
 
       - name: Import Existing Resources
         env:
-          TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
-          TF_VAR_dataset_id: ${{ secrets.DATASET_ID }}
-          TF_VAR_table_id: ${{ secrets.TABLE_ID }}
-          TF_VAR_google_service_account_email: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: |
           cd ./terraform
           echo "Importing resources into Terraform state..."
-      
-          # Define el nombre dinámico para el recurso
-          DATASET_RESOURCE="google_bigquery_dataset.${TF_VAR_dataset_id}"
-      
-          # Usa la variable en el comando terraform import
-          terraform import "$DATASET_RESOURCE" "projects/${TF_VAR_project_id}/datasets/${TF_VAR_dataset_id}" || echo "Dataset already managed by Terraform"
-          terraform import google_pubsub_topic.data_ingestion "projects/${TF_VAR_project_id}/topics/data-ingestion" || echo "Topic already managed by Terraform"
-          terraform import google_storage_bucket.function_bucket "${TF_VAR_project_id}-function-bucket" || echo "Bucket already managed by Terraform"
-          terraform import google_pubsub_subscription.data_ingestion_subscription "projects/${TF_VAR_project_id}/subscriptions/data-ingestion-subscription" || echo "Subscription already managed by Terraform"
-          terraform import google_bigquery_table.latam1 "projects/${TF_VAR_project_id}/datasets/${TF_VAR_dataset_id}/tables/latam" || echo "Table already managed by Terraform"
-          terraform import google_cloudfunctions_function.pubsub_to_bigquery "${TF_VAR_project_id}/us-central1/pubsub-to-bigquery" || echo "Cloud Function already managed by Terraform"
+          terraform import google_bigquery_dataset.desafio_latam "projects/${GCP_PROJECT_ID}/datasets/desafio_latam" || echo "Dataset already managed by Terraform"
+          terraform import google_pubsub_topic.data_ingestion "projects/${GCP_PROJECT_ID}/topics/data-ingestion" || echo "Topic already managed by Terraform"
+          terraform import google_storage_bucket.function_bucket "${GCP_PROJECT_ID}-function-bucket" || echo "Bucket already managed by Terraform"
+          terraform import google_pubsub_subscription.data_ingestion_subscription "projects/${GCP_PROJECT_ID}/subscriptions/data-ingestion-subscription" || echo "Subscription already managed by Terraform"
+          terraform import google_bigquery_table.latam1 "projects/${GCP_PROJECT_ID}/datasets/desafio_latam/tables/latam" || echo "Table already managed by Terraform"
+          terraform import google_cloudfunctions_function.pubsub_to_bigquery "${GCP_PROJECT_ID}/us-central1/pubsub-to-bigquery" || echo "Cloud Function already managed by Terraform"
 
       - name: Terraform Plan
         env:
-          TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
-          TF_VAR_dataset_id: ${{ secrets.DATASET_ID }}
-          TF_VAR_table_id: ${{ secrets.TABLE_ID }}
-          TF_VAR_google_service_account_email: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: cd ./terraform && terraform plan
 
       - name: Terraform Apply
         env:
-          TF_VAR_project_id: ${{ secrets.PROJECT_ID }}
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
-          TF_VAR_dataset_id: ${{ secrets.DATASET_ID }}
-          TF_VAR_table_id: ${{ secrets.TABLE_ID }}
-          TF_VAR_google_service_account_email: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: cd ./terraform && terraform apply -auto-approve
 
       - name: Confirm completion

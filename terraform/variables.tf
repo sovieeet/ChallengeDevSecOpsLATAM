@@ -1,6 +1,7 @@
 variable "project_id" {
   description = "ID of the project"
   type        = string
+  default     = "pruebalatam-438117"
 }
 
 variable "google_credentials" {
@@ -19,6 +20,7 @@ variable "region" {
 variable "dataset_id" {
   description = "Bigquery dataset ID"
   type        = string
+  default     = "desafio_latam"
 }
 
 variable "location" {
@@ -30,9 +32,11 @@ variable "location" {
 variable "table_id" {
     description = "Bigquery table ID"
     type        = string
+    default     = "latam"
 }
 
 variable "google_service_account_email" {
   description = "Service account email"
   type        = string
+  default     = "sa-project@pruebalatam-438117.iam.gserviceaccount.com"
 }
