@@ -2,10 +2,13 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY challengelatam/API/requirements.txt .
+COPY requirements.txt .
+
 RUN pip install -r requirements.txt
 
-COPY challengelatam/API/ .
+COPY challengelatam/API /app
 
 EXPOSE 8080
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+
+# Comando para iniciar la aplicación
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -1,17 +1,13 @@
 import base64
 import json
-import os
 from google.cloud import bigquery
-from dotenv import load_dotenv
 
-load_dotenv()
-
-PROJECT_ID = os.getenv("PROJECT_ID")
-DATASET_ID = os.getenv("DATASET_ID")
-TABLE_ID = os.getenv("TABLE_ID")
+PROJECT_ID = "pruebalatam-438117"
+DATASET_ID = "desafio_latam"
+TABLE_ID = "latam"
 
 def pubsub_to_bigquery(event, context):
-    client = bigquery.Client()
+    client = bigquery.Client(project=PROJECT_ID)
     table_id = f"{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}"
 
     message = base64.b64decode(event['data']).decode('utf-8')

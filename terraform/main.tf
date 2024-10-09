@@ -26,6 +26,50 @@ resource "google_project_iam_member" "bigquery_admin" {
   }
 }
 
+# Artifact Registry Admin
+resource "google_project_iam_member" "artifact_registry_admin" {
+  project = var.project_id
+  role    = "roles/artifactregistry.admin"
+  member  = "serviceAccount:${var.google_service_account_email}"
+
+  lifecycle {
+    ignore_changes = [role, member]
+  }
+}
+
+# Cloud Run Admin
+resource "google_project_iam_member" "cloud_run_admin" {
+  project = var.project_id
+  role    = "roles/run.admin"
+  member  = "serviceAccount:${var.google_service_account_email}"
+
+  lifecycle {
+    ignore_changes = [role, member]
+  }
+}
+
+# Service Usage Admin
+resource "google_project_iam_member" "service_usage_admin" {
+  project = var.project_id
+  role    = "roles/serviceusage.serviceUsageAdmin"
+  member  = "serviceAccount:${var.google_service_account_email}"
+
+  lifecycle {
+    ignore_changes = [role, member]
+  }
+}
+
+# Viewer
+resource "google_project_iam_member" "viewer" {
+  project = var.project_id
+  role    = "roles/viewer"
+  member  = "serviceAccount:${var.google_service_account_email}"
+
+  lifecycle {
+    ignore_changes = [role, member]
+  }
+}
+
 # Storage Admin
 resource "google_project_iam_member" "storage_admin" {
   project = var.project_id

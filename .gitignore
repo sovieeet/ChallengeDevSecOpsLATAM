@@ -1,2 +1,5 @@
 .venv/
 function.zip
+*.json
+*.env
+__pycache__/

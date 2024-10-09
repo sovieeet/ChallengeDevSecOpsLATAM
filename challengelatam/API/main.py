@@ -1,16 +1,16 @@
 from fastapi import FastAPI, HTTPException
 from google.cloud import bigquery
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
+PROJECT_ID = "pruebalatam-438117"
+DATASET_ID = "desafio_latam"
+TABLE_ID = "latam"
 
-PROJECT_ID = os.getenv("PROJECT_ID")
-DATASET_ID = os.getenv("DATASET_ID")
-TABLE_ID = os.getenv("TABLE_ID")
+print("Project ID:", PROJECT_ID)
+print("Dataset ID:", DATASET_ID)
+print("Table ID:", TABLE_ID)
 
 app = FastAPI()
-client = bigquery.Client()
+client = bigquery.Client(project=PROJECT_ID)
 
 @app.get("/data")
 async def get_data():
