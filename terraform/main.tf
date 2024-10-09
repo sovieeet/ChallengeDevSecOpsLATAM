@@ -26,16 +26,17 @@ resource "google_project_iam_member" "bigquery_admin" {
   }
 }
 
-# Artifact Registry Writer
-resource "google_project_iam_member" "artifact_registry_writer" {
+# Artifact Registry Admin
+resource "google_project_iam_member" "artifact_registry_admin" {
   project = var.project_id
-  role    = "roles/artifactregistry.writer"
+  role    = "roles/artifactregistry.admin"
   member  = "serviceAccount:${var.google_service_account_email}"
 
   lifecycle {
     ignore_changes = [role, member]
   }
 }
+
 
 # Storage Admin
 resource "google_project_iam_member" "storage_admin" {
