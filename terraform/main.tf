@@ -37,6 +37,18 @@ resource "google_project_iam_member" "storage_admin" {
   }
 }
 
+# Cloud Functions Admin
+resource "google_project_iam_member" "cloud_functions_admin" {
+  project = var.project_id
+  role    = "roles/cloudfunctions.admin"
+  member  = "serviceAccount:${var.google_service_account_email}"
+
+  lifecycle {
+    ignore_changes = [role, member]
+  }
+}
+
+
 # BigQuery Dataset
 resource "google_bigquery_dataset" "desafio_latam" {
   dataset_id = var.dataset_id
