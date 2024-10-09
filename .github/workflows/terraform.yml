@@ -29,7 +29,7 @@ jobs:
       - name: Create ZIP for Cloud Function
         run: |
             cd challengelatam/pubsub
-            zip -r ../../terraform/function.zip function/
+            zip -r ../../terraform/function.zip pubsub/
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
