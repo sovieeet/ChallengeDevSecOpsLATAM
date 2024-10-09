@@ -33,4 +33,10 @@ variable "table_id" {
     description = "Bigquery table ID"
     type        = string
     default     = "latam"
-} 
+}
+
+variable "google_service_account_email" {
+  description = "Service account email"
+  type        = string
+  default     = "sa-project@pruebalatam-438117.iam.gserviceaccount.com"
+}

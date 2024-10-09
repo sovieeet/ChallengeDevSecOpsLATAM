@@ -4,6 +4,28 @@ provider "google" {
   credentials = var.google_credentials
 }
 
+# Pub/Sub Admin
+resource "google_project_iam_member" "pubsub_admin" {
+  project = var.project_id
+  role    = "roles/pubsub.admin"
+  member  = "serviceAccount:${var.google_service_account_email}"
+}
+
+# BigQuery Admin
+resource "google_project_iam_member" "bigquery_admin" {
+  project = var.project_id
+  role    = "roles/bigquery.admin"
+  member  = "serviceAccount:${var.google_service_account_email}"
+}
+
+# Storage Admin
+resource "google_project_iam_member" "storage_admin" {
+  project = var.project_id
+  role    = "roles/storage.admin"
+  member  = "serviceAccount:${var.google_service_account_email}"
+}
+
+
 # BigQuery Dataset
 resource "google_bigquery_dataset" "desafio_latam" {
   dataset_id = var.dataset_id
@@ -38,7 +60,7 @@ resource "google_storage_bucket_object" "function_code" {
 # Cloud Function activated with Pub/Sub and write in BigQuery
 resource "google_cloudfunctions_function" "pubsub_to_bigquery" {
   name        = "pubsub-to-bigquery"
-  description = "Función para insertar datos de Pub/Sub en BigQuery"
+  description = "Function to insert Pub/Sub data into BigQuery"
   runtime     = "python39"
   region      = var.region
 
