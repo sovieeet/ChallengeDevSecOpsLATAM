@@ -140,7 +140,7 @@ resource "google_cloudfunctions_function" "pubsub_to_bigquery" {
   region      = var.region
 
   # Function settings
-  entry_point           = "pubsub_to_bigquery"
+  entry_point           = "main"
   source_archive_bucket = google_storage_bucket.function_bucket.name
   source_archive_object = google_storage_bucket_object.function_code.name
 
