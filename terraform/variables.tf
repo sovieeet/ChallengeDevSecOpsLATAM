@@ -4,6 +4,11 @@ variable "project_id" {
   default     = "pruebalatam-438117"
 }
 
+variable "google_credentials" {
+  description = "Google Cloud credentials JSON"
+  type        = string
+}
+
 variable "region" {
   description = "Region of project"
   type        = string

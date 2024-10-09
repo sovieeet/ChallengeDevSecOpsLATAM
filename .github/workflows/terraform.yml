@@ -35,9 +35,9 @@ jobs:
         working-directory: ./terraform
 
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -var="google_credentials=${{ secrets.GCP_SA_KEY }}"
         working-directory: ./terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var="google_credentials=${{ secrets.GCP_SA_KEY }}"
         working-directory: ./terraform

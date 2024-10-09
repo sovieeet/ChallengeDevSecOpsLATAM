@@ -1,11 +1,7 @@
 provider "google" {
-  project = var.project_id
-  region  = var.region
-}
-
-resource "google_bigquery_dataset" "desafio_latam" {
-  dataset_id = var.dataset_id
-  location   = var.location
+  project     = var.project_id
+  region      = var.region
+  credentials = jsondecode(var.google_credentials)
 }
 
 resource "google_bigquery_table" "latam1" {
