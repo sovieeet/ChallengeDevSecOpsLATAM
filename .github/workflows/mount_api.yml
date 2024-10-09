@@ -21,6 +21,9 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker
+        
       - name: Authenticate Docker to Google Cloud
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
