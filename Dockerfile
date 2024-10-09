@@ -8,7 +8,7 @@ RUN pip install -r requirements.txt
 
 COPY challengelatam/API /app
 
-EXPOSE 8000
+EXPOSE 8080
 
 # Comando para iniciar la aplicación
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
