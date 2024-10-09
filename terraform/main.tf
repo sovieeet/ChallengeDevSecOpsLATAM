@@ -37,6 +37,19 @@ resource "google_project_iam_member" "artifact_registry_admin" {
   }
 }
 
+# Cloud Run Admin
+resource "google_project_iam_member" "cloud_run_admin" {
+  project = var.project_id
+  role    = "roles/run.admin"
+  member  = "serviceAccount:${var.google_service_account_email}"
+}
+
+# Viewer
+resource "google_project_iam_member" "viewer" {
+  project = var.project_id
+  role    = "roles/viewer"
+  member  = "serviceAccount:${var.google_service_account_email}"
+}
 
 # Storage Admin
 resource "google_project_iam_member" "storage_admin" {
