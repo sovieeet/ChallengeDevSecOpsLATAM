@@ -31,13 +31,10 @@ jobs:
           terraform_wrapper: false
 
       - name: Initialize Terraform
-        run: terraform init
-        working-directory: ./terraform
+        run: terraform init -chdir=./terraform
 
       - name: Terraform Plan
-        run: terraform plan -var="google_credentials=${{ secrets.GCP_SA_KEY }}"
-        working-directory: ./terraform
+        run: terraform plan -var="google_credentials=${{ secrets.GCP_SA_KEY }}" -chdir=./terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var="google_credentials=${{ secrets.GCP_SA_KEY }}"
-        working-directory: ./terraform
+        run: terraform apply -auto-approve -var="google_credentials=${{ secrets.GCP_SA_KEY }}" -chdir=./terraform
