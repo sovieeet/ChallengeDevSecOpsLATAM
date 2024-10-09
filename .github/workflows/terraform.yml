@@ -46,7 +46,7 @@ jobs:
         run: |
           cd ./terraform
           echo "Importing resources into Terraform state..."
-          terraform import google_bigquery_dataset.desafio_latam "${GCP_PROJECT_ID}:desafio_latam" || echo "Dataset already managed by Terraform"
+          terraform import google_bigquery_dataset.desafio_latam "projects/${GCP_PROJECT_ID}/datasets/desafio_latam" || echo "Dataset already managed by Terraform"
           terraform import google_pubsub_topic.data_ingestion "projects/${GCP_PROJECT_ID}/topics/data-ingestion" || echo "Topic already managed by Terraform"
           terraform import google_storage_bucket.function_bucket "${GCP_PROJECT_ID}-function-bucket" || echo "Bucket already managed by Terraform"
 
