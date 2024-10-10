@@ -1,19 +1,18 @@
-name: Deploy Terraform to GCP
+name: Deploy_Terraform_To_GCP
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - feature/*
-  pull_request:
-    branches:
-      - main
-      - develop
-  workflow_call: {}
+    push:
+      branches:
+        - main
+        - develop
+        - feature/*
+
+concurrency:
+  group: "terraform-deployment"
+  cancel-in-progress: true
 
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -67,6 +66,3 @@ jobs:
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: cd ./terraform && terraform apply -auto-approve
-
-      - name: Confirm completion
-        run: echo "Terraform workflow completed successfully."

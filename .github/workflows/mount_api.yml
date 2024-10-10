@@ -1,11 +1,14 @@
 name: Deploy FastAPI to Cloud Run
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - feature/*
+  workflow_run:
+    workflows: ["Deploy_Terraform_To_GCP"]
+    types:
+      - completed
+
+concurrency:
+  group: "api-deployment"
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
