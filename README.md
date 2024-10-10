@@ -5,11 +5,11 @@
 
 Para esta infraestructura la dividiremos en 3 partes:
 
-- **Ingesta de datos (Esquema Pub/Sub)**: Para esto se usará Google Cloud Pub/Sub junto a un Cloud Function que se activará cada vez que se reciba un mensaje.
+- **Ingesta de datos (Esquema Pub/Sub)**: Google Cloud Pub/Sub se utiliza para recibir y gestionar mensajes de ingesta de datos. Cada vez que se publica un mensaje en Pub/Sub, este activa automáticamente una Cloud Function que procesa el mensaje y envía los datos hacia BigQuery para su almacenamiento y análisis.
 
-- **Base de datos**: Para esto se usara BigQuery con su respectivo esquema
+- **Base de datos**: Para esto se usará BigQuery con su respectivo esquema, con los datos almacenados que son enviados por la Cloud Function.
 
-- **Exposición de datos mediate una API**: Se levantará la API usando Cloud Run, permitiendo que terceros accedan a los datos almacenados mediante un endpoint.
+- **Exposición de datos mediate una API**: La API se implementará en Cloud Run, lo que permitirá que terceros accedan a los datos almacenados a través de un endpoint. El código de la API está ubicado en la carpeta `API`, y se configura para ser desplegado en Cloud Run utilizando Docker. La API consume directamente una tabla en BigQuery para obtener todos los datos de esta tabla.
 
 Esta infraestructura se levantará usando Terraform.
 
@@ -39,15 +39,15 @@ Además, desde el PubSub es posible visualizar los mensajes enviados, sean erró
 ![Diagrama del flujo de la data](challengelatam/assets/data_ingestion.png)
 
 2. Google Cloud Pub/Sub recibe estos mensajes y los distribuye a las suscripciones correspondientes (en este caso llamado `data-ingestion-subscription` creado mediante un modulo de Terraform)
-3. La cloud functión está suscrita al tópico de Pub/Sub y se triggerea automáticamente cada vez que llega un mensaje:
+3. La Cloud Function está suscrita al tópico de Pub/Sub y se triggerea automáticamente cada vez que llega un mensaje:
     - La función decodifica el mensaje, lo procesa, y prepara los datos para el almacenamiento.
     - La función contiene validaciones para asegurar que el mensaje cumple con el formato requerido.
 ![Cloud Function](challengelatam/assets/cf.png)
 
-4. La cloud function ingresa los datos a una tabla en BigQuery llamada `latam`, que contiene las columnas `id`, `name` y `timestamp`, almacenandose en tiempo real.
+4. La Cloud Function ingresa los datos a una tabla en BigQuery llamada `latam`, que contiene las columnas `id`, `name` y `timestamp`, almacenandose en tiempo real en la tabla.
 ![Cloud Function](challengelatam/assets/tabla.png)
 
-5. Los datos se exponen mediante una API con la url *`https://desafio-latam-213520764589.us-central1.run.app`* en la cual usando un GET al endpoint `/data`, es posible obtener toda la información contenida en la tabla de BigQuery.
+5. Los datos se exponen mediante una API con la url *`https://desafio-latam-213520764589.us-central1.run.app`* en la cual usando un GET al endpoint `/data`, es posible obtener toda la información de la tabla de BigQuery.
 
 ![API](challengelatam/assets/api.png)
 
