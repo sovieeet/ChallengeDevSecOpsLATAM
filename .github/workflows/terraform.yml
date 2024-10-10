@@ -4,7 +4,7 @@ on:
     - push
 
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -58,6 +58,3 @@ jobs:
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: cd ./terraform && terraform apply -auto-approve
-
-      - name: Confirm completion
-        run: echo "Terraform workflow completed successfully."
