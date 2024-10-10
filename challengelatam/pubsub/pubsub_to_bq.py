@@ -1,6 +1,6 @@
 import base64
 import json
-from pubsub import pubsub_to_bigquery
+from main import pubsub_to_bigquery
 
 def test_pubsub_to_bigquery():
     data = {
