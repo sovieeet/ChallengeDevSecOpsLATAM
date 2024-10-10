@@ -2,13 +2,10 @@ import base64
 import json
 from google.cloud import bigquery
 import logging
+from config.config import PROJECT_ID, DATASET_ID, TABLE_ID
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-PROJECT_ID = "pruebalatam-438117"
-DATASET_ID = "desafio_latam"
-TABLE_ID = "latam"
 
 def pubsub_to_bigquery(event, context):
     client = bigquery.Client(project=PROJECT_ID)

@@ -5,19 +5,23 @@
 
 Para esta infraestructura la dividiremos en 3 partes:
 
-- Ingesta de datos (Esquema Pub/Sub): Para esto se usará Google Cloud Pub/Sub junto a un Cloud Function que se activará cada vez que se reciba un mensaje.
+- **Ingesta de datos (Esquema Pub/Sub)**: Para esto se usará Google Cloud Pub/Sub junto a un Cloud Function que se activará cada vez que se reciba un mensaje.
 
-- Base de datos: Para esto se usara BigQuery con su respectivo esquema
+- **Base de datos**: Para esto se usara BigQuery con su respectivo esquema
 
-- Exposición de datos mediate una API: Se levantará la API usando Cloud Run, permitiendo que terceros accedan a los datos almacenados mediante un endpoint.
+- **Exposición de datos mediate una API**: Se levantará la API usando Cloud Run, permitiendo que terceros accedan a los datos almacenados mediante un endpoint.
 
-Esta infraestructura se levantará usando terraform.
+Esta infraestructura se levantará usando Terraform.
 
 ## 2. Aplicaciones y flujo CI/CD
 
 En este caso como CI/CD se usó Git Actions, dividido en el levantamiento de toda la infraestructura que incluye los permisos de la service account correspondiente,
 el dataset y la base de datos, junto con el Pub/Sub Topic, el Bucket, la Cloud Function creada con el Pub/Sub junto a sus respectivos triggers y suscripción.
 La API se levantó en otro CI/CD mediante Docker usando Cloud Run para mayor facilidad y rápidez de levantamiento.
+
+Esto se levanta usando una cuenta de servicio en GCP usando solamente los permisos necesarios con los secretos guardados en Github Secrets para mayor seguridad.
+
+Además, se guardaron el **PROJECT_ID**, **DATASET_ID** y **TABLE_ID** en variables para evitar la repetición de código.
 
 El flujo de datos se compone de la siguiente manera:
 
@@ -43,10 +47,65 @@ Además, desde el PubSub es posible visualizar los mensajes enviados, sean erró
 4. La cloud function ingresa los datos a una tabla en BigQuery llamada `latam`, que contiene las columnas `id`, `name` y `timestamp`, almacenandose en tiempo real.
 ![Cloud Function](challengelatam/assets/tabla.png)
 
-5. Los datos se exponen mediante una API con la url `https://desafio-latam-213520764589.us-central1.run.app` en la cual usando un GET al endpoint `/data`, es posible obtener toda la información contenida en la tabla de BigQuery.
+5. Los datos se exponen mediante una API con la url *`https://desafio-latam-213520764589.us-central1.run.app`* en la cual usando un GET al endpoint `/data`, es posible obtener toda la información contenida en la tabla de BigQuery.
 
 ![API](challengelatam/assets/api.png)
 
 El diagrama muestra el flujo de la data:
 
 ![Diagrama del flujo de la data](challengelatam/assets/Diagram.png)
+
+## 3. Pruebas de Integración y Puntos Críticos de Calidad
+
+1. Las pruebas de integración principales son el *[test_integration.py](challengelatam/test/test_integration.py)* y el *[test_validation_data.py](challengelatam/test/test_validation_data.py)*. Estas pruebas verifican que la API está disponible y respondiendo exitosamente en el endpoint esperado, lo cual confirma que el servicio está correctamente desplegado y que la API devuelve datos de acuerdo con el esquema y el formato esperado, validando que el contenido es preciso y que corresponde a los datos almacenados en la base de datos. Estas pruebas están integradas en el flujo de CI/CD para ejecutarse después de desplegar la API en Cloud Run. Esto asegura que cualquier cambio o actualización de la API sea verificado automáticamente, manteniendo la integridad y disponibilidad del sistema en cada despliegue.
+
+Se agregaron otras pruebas como el *[test_health.py](challengelatam/test/test_health.py)* y *[test_invalid_endpoint.py](challengelatam/test/test_invalid_endpoint.py)* como extras, pero no son parte de la prueba de integración.
+
+2. Otras pruebas de integración que se podrían aplicar incluyen:
+
+- **Prueba de respuesta sin datos en la tabla**: Esta prueba asegura que la API maneje correctamente los casos en los que la tabla de datos está vacía, sin generar errores inesperados. La API debería responder con un código 200 y un mensaje o un objeto vacío, indicando que no hay datos disponibles. Esto permite verificar la robustez de la API al enfrentarse a una base de datos sin registros.
+
+- **Prueba con datos mal formateados**: Es posible que la base de datos reciba entradas con campos incompletos o con un formato inesperado. Una prueba de integración puede simular esta situación para verificar que la API maneja adecuadamente los errores de formato en lugar de interrumpir su servicio. Esta prueba implica agregar datos con errores en la tabla y observar que la API devuelva un mensaje de error informativo, sin interrumpir el flujo normal del servicio.
+
+- **Prueba de integridad del formato de respuesta**: Para asegurar que el cliente siempre recibe el mismo formato de datos, esta prueba verifica que el esquema de los datos devueltos por la API se mantenga constante. Esto ayuda a que los usuarios de la API tengan una experiencia uniforme y evita fallos de compatibilidad con sistemas consumidores.
+
+3. Se podrían definir los siguiente puntos críticos del sistema a considerar:
+
+- **Sobrecarga de la API**: La API podría sobrecargarse si recibe muchas solicitudes simultáneas que podrían provocar que se ralentice o se bloquee.
+
+- **Escalabilidad del Cloud Run y límites de recursos**: La API está desplegada en Cloud Run, lo que puede causar limitaciones de CPU y memoria que afecten su rendimiento y capacidad de respuesta en situaciones de alto tráfico. Esto se podría medir con el monitoreo de recursos en Cloud Run para medir el uso de CPU, memoria y tiempo de ejecución. Se podrían realizar pruebas de carga para validar que la API funciona bajo muchas solicitudes.
+
+- **Sobreutilización o costo excesivo**: Si bien esto no corresponde especificamente a algo técnico del sistema, si la API o la función Pub/Sub son llamadas frecuentemente, podría haber un aumento significativo en los costos. Se podrían configurar alertas de presupuesto en GCP para recibir notificaciones si el costo excede el límite establecido. Simular un escenario de alto tráfico serviría estimar el costo y revisar si es posible optimizar el diseño o configuración para reducir gastos.
+
+- **Integridad de datos**: Si la Cloud Function que inserta datos en BigQuery falla, podría resultar en datos incompletos o corruptos, lo cual afecta el análisis. Pruebas de integración que verifiquen la integridad de los datos después de ser insertados podría ser una medida para esto, además de monitorear los logs de la Cloud Function para detectar errores.
+
+- **Autenticación y control de accesos**: Se podría añadir una autenticación mediante Bearer Tokens para que solo las cuentas autorizadas puedan acceder a la API, añadiendo una capa de seguridad. Se podrían configurar pruebas para simular el acceso con tokens válidos e inválidos, además de monitorear los logs de acceso.
+
+4. Si bien en el punto anterior se abordaron las maneras de tratar, medir y testear los puntos críticos, acá se expandirá un poco más eso:
+
+- #### **Sobrecarga de la API**: 
+  - Si el tráfico aumenta considerablemente, se podría habilitar un balanceador de carga para distribuir las solicitudes entre varias instancias de la API, asegurando que no se sobrecargue una sola instancia.
+
+  - Aprovechar la función de escalado automático de Cloud Run para que bajo demanda se generen más instancias de la API y puedan atender mayor tráfico. Esto puede configurarse con límites para evitar costos excesivos.
+
+- #### **Escalabilidad y recursos en Cloud Run**:
+  - Ajustar los recursos asignados (CPU y memoria) en Cloud Run según el perfil de uso de la API. Realizar pruebas de rendimiento para encontrar la configuración ideal que minimice el uso sin sacrificar rendimiento.
+
+  - Realizar pruebas de carga periódicas para identificar el punto de quiebre de la API y ajustar la configuración en consecuencia.
+
+  - Configurar límites de tiempo en las solicitudes para que las llamadas que demoren demasiado se terminen, liberando recursos para nuevas solicitudes y evitando bloqueos.
+
+- #### **Mitigación de costos**:
+  - Establecer un límite máximo de instancias para evitar un escalado excesivo y reducir costos.
+
+  - Usar técnicas como _batching_ en la Cloud Function para agrupar mensajes de Pub/Sub y hacer menos inserciones a BigQuery, lo cual reduciría el costo en operaciones de escritura.
+
+- #### **Integridad de datos en BigQuery**:
+  - Configurar mecanismos de reintento en la Cloud Function para manejar fallos intermitentes en la inserción de datos. Esto puede evitar que datos válidos se pierdan.
+
+  - Implementar validaciones adicionales en la Cloud Function para garantizar que solo datos válidos ingresen a BigQuery, evitando corrupción de datos.
+
+  - Configurar backups automáticos de BigQuery.
+
+- #### **Autenticación y control de accesos**:
+  - Implementar Bearer Tokens para autenticar y autorizar el acceso a la API. Configurar un sistema de autenticación con IAM para manejar accesos y permisos.

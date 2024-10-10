@@ -10,7 +10,6 @@ variable "google_credentials" {
   sensitive   = true
 }
 
-
 variable "region" {
   description = "Region of project"
   type        = string
