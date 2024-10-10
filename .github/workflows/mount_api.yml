@@ -2,7 +2,7 @@ name: Deploy FastAPI to Cloud Run
 
 on:
   workflow_run:
-    workflows: ["Deploy_Terraform_To_GCP"]
+    workflows: ["Deploy Terraform To GCP"]
     types:
       - completed
 

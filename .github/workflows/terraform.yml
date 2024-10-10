@@ -1,11 +1,10 @@
-name: Deploy_Terraform_To_GCP
+name: Deploy Terraform To GCP
 
 on:
     push:
       branches:
         - main
         - develop
-        - feature/*
 
 concurrency:
   group: "terraform-deployment"
