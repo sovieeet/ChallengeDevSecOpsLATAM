@@ -1,7 +1,7 @@
 import requests
 
 def test_api_data_schema():
-    url = "https://fastapi-app-213520764589.us-central1.run.app/data"
+    url = "https://desafio-latam-213520764589.us-central1.run.app/data"
     response = requests.get(url)
     
     assert response.status_code == 200, f"Error: API responded with code {response.status_code}, expected 200"
