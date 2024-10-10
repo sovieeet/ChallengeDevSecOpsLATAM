@@ -1,11 +1,10 @@
 name: Deploy FastAPI to Cloud Run
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - feature/*
+  workflow_run:
+    workflows: ["Deploy Terraform to GCP"]
+    types:
+      - completed
 
 jobs:
   build-and-deploy:
