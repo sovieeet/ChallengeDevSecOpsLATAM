@@ -6,7 +6,8 @@ COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
-COPY challengelatam/API /app
+COPY challengelatam/API /app/API
+COPY challengelatam/config /app/config
 
 EXPOSE 8080
 
