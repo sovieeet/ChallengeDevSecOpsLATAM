@@ -1,4 +1,4 @@
-name: Deploy Terraform to GCP
+name: Deploy_Terraform_To_GCP
 
 on:
     - push
