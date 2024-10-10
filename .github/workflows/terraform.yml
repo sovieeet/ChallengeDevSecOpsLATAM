@@ -1,11 +1,10 @@
-name: Deploy_Terraform_To_GCP
+name: Deploy Terraform To GCP
 
 on:
     push:
       branches:
         - main
         - develop
-        - feature/*
 
 concurrency:
   group: "terraform-deployment"
@@ -19,11 +18,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2.1.1
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff Linter
+        run: ruff check .
 
       - name: Create ZIP for Cloud Function
         run: |
@@ -66,3 +75,18 @@ jobs:
           TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: cd ./terraform && terraform apply -auto-approve
+
+      - name: Increment version
+        if: github.ref == 'refs/heads/main'
+        run: |
+          version=$(cat .version)
+          IFS='.' read -ra ver <<< "$version"
+          new_version="${ver[0]}.$((ver[1] + 1)).${ver[2]}"
+          echo "$new_version" > .version
+          
+          # Commit automático del archivo actualizado
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .version
+          git commit -m "Bump version to $new_version"
+          git push origin main

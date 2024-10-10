@@ -92,6 +92,16 @@ resource "google_project_iam_member" "cloud_functions_admin" {
   }
 }
 
+# Project IAM Admin to give API permissions to the project with the service account
+resource "google_project_iam_member" "project_iam_admin" {
+  project = var.project_id
+  role    = "roles/resourcemanager.projectIamAdmin"
+  member  = "serviceAccount:${var.google_service_account_email}"
+
+  lifecycle {
+    ignore_changes = [role, member]
+  }
+}
 
 # BigQuery Dataset
 resource "google_bigquery_dataset" "desafio_latam" {
