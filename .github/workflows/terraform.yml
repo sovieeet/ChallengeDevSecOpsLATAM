@@ -1,0 +1,68 @@
+name: Deploy_Terraform_To_GCP
+
+on:
+    push:
+      branches:
+        - main
+        - develop
+        - feature/*
+
+concurrency:
+  group: "terraform-deployment"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2.1.1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Create ZIP for Cloud Function
+        run: |
+            cd challengelatam/pubsub
+            zip -r ../../terraform/function.zip main.py requirements.txt
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+
+      - name: Initialize Terraform
+        env:
+          TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: cd ./terraform && terraform init
+
+      - name: Import Existing Resources
+        env:
+          TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          cd ./terraform
+          echo "Importing resources into Terraform state..."
+          terraform import google_bigquery_dataset.desafio_latam "projects/${GCP_PROJECT_ID}/datasets/desafio_latam" || echo "Dataset already managed by Terraform"
+          terraform import google_pubsub_topic.data_ingestion "projects/${GCP_PROJECT_ID}/topics/data-ingestion" || echo "Topic already managed by Terraform"
+          terraform import google_storage_bucket.function_bucket "${GCP_PROJECT_ID}-function-bucket" || echo "Bucket already managed by Terraform"
+          terraform import google_pubsub_subscription.data_ingestion_subscription "projects/${GCP_PROJECT_ID}/subscriptions/data-ingestion-subscription" || echo "Subscription already managed by Terraform"
+          terraform import google_bigquery_table.latam1 "projects/${GCP_PROJECT_ID}/datasets/desafio_latam/tables/latam" || echo "Table already managed by Terraform"
+          terraform import google_cloudfunctions_function.pubsub_to_bigquery "${GCP_PROJECT_ID}/us-central1/pubsub-to-bigquery" || echo "Cloud Function already managed by Terraform"
+
+      - name: Terraform Plan
+        env:
+          TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: cd ./terraform && terraform plan
+
+      - name: Terraform Apply
+        env:
+          TF_VAR_google_credentials: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: cd ./terraform && terraform apply -auto-approve
