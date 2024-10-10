@@ -139,3 +139,45 @@ Se agregaron otras pruebas como el *[test_health.py](challengelatam/test/test_he
         - **Decisiones estratégicas**: Si la cola crece constantemente, puede ser necesario escalar la Cloud Function para procesar los mensajes más rápido o ajustar el batching para manejar mejor los picos de tráfico.
 
     Con estos paneles, se puede visualizar la salud general del sistema en tiempo real y recibir alertas en caso de que alguna métrica supere los umbrales críticos. Así podrían implementarse optimizaciones de costos o ajustes de recursos de manera anticipada, manteniendo la estabilidad y eficiencia del sistema.
+
+3. Como se indicó anteriormente, la forma más rápida de implementar monitoreo y recolección de métricas es con Google Cloud Monitoring junto a Google Cloud Logging. Para la recolección de métricas en base a las 3 métricas indicadas en esta parte se usaría lo siguiente:
+
+    - **API en Cloud Run**: Se habilitaría la integración de Google Cloud Monitoring y Logging en el servicio de Cloud Run. Esto permite recolectar métricas como tiempos de respuesta, tasa de solicitudes y errores. Se configura automáticamente al desplegar la API en Cloud Run.
+
+    - **Cloud Function (Pub/Sub a BigQuery)**: Google Cloud Functions permite monitorear métricas como número de ejecuciones, errores y latencia. Estas métricas se habilitan al activar la integración con Monitoring y Logging en la configuración de la Cloud Function.
+
+    - **Pub/Sub**: Para los mensajes en cola y la cantidad de mensajes procesados, GCP proporciona métricas que se pueden activar en Pub/Sub, tales como el número de mensajes en cola y errores de procesamiento.
+
+    Para las alertas, estas pueden configurarse en Google Cloud Monitoring con umbrales específicos. Por ejemplo, un tiempo de respuesta de API superior a un valor específico o una alta tasa de errores en la Cloud Function. Estas alertas pueden notificarse mediante correos electrónicos o integraciones de mensajería para una respuesta rápida.
+
+    Para la visualización, se usarían paneles en Clouyd Monitoring Dashboards que incluyan gráficas y tablas para las métricas clave. Esto permite una vista centralizada de los datos en tiempo real y facilita la identificación de problemas y tendencias. Además, cada panel incluiría gráficos personalizados para el tiempo de respuesta de la API, tasa de errores de Cloud Function y número de mensajes en cola de Pub/Sub.
+
+    Con Cloud Logging, se almacenarían todos los eventos registrados en cada componente del sistema para análisis posterior, permitiendo revisar el historial de eventos y detectar patrones o problemas recurrentes. Además Cloud Monitoring permite almacenar métricas históricas, lo cual facilita el análisis a largo plazo y la identificación de tendencias en el rendimiento del sistema. Este almacenamiento de datos históricos es útil para ajustes estratégicos y para responder a eventos específicos o problemas inesperados con análisis más detallados.
+
+4. Con la expansión a 50 sistemas similares, la visualización debe adaptarse para mejorar la visualización, manteniendo claridad en el monitoreo de cada sistema individual y del conjunto en su totalidad. Se podría adaptar la visualización de las siguientes formas:
+
+    - Un panel central que muestre métricas agregadas de todos los sistemas, como tasas de error globales, tiempos de respuesta promedio y tasas de procesamiento de mensajes en Pub/Sub. Esto permite una evaluación rápida de la salud general del conjunto de sistemas.
+
+    - Cada sistema podría tener su propio panel con métricas específicas, lo que permitiría el análisis detallado en caso de problemas en un sistema en particular. Una busqueda con filtros o instancias facilitaría profundizar en sistemas individuales.
+
+    - Métricas de interdependencia, que midan la latencia y el éxito de las conexiones entre sistemas.
+
+    - Métricas que comparen el rendimiento individual con el promedio de todos los sistemas para identificar anomalías.
+
+    - Visualización del uso acumulado de recursos, como consumo de CPU, memoria y almacenamiento de datos en BigQuery para prever límites de escalabilidad.
+
+    - Mapas de calor para mostrar patrones en el rendimiento y uso de recursos en diferentes horarios y días, ayudando a identificar picos de demanda o anomalías.
+
+    - Gráficos de series temporales para evaluar cómo se desempeñan los sistemas a lo largo del tiempo, detectar patrones de carga y ajustar el escalamiento y el uso de recursos de manera preventiva.
+
+    - Alertas configuradas para que se activen solo cuando un porcentaje significativo de sistemas experimente fallos, lo cual permite concentrarse en problemas de mayor escala y evita alertas aisladas por errores menores en un único sistema.
+
+5. Si no se aborda adecuadamente el problema de escalabilidad en la observabilidad del sistema, podrían surgir diversas limitaciones que afectarían directamente la eficiencia y el costo del sistema en su conjunto. Las siguientes dificultades y limitaciones se generarían:
+
+    - **Alertas y notificaciones excesivas**: Con un número creciente de sistemas, es probable que se generen notificaciones en exceso si no se configura un filtrado adecuado. Esto podría causar una "fatiga de alertas," donde se pueden llegar a ignorar notificaciones importantes debido a la gran cantidad de alertas menores o poco relevantes. Este problema incrementa el riesgo de que incidentes críticos pasen desapercibidos y se demore la respuesta.
+
+    - **Desempeño degradado del sistema de monitoreo**: Al añadir múltiples sistemas, la infraestructura de monitoreo podría sufrir una sobrecarga si no cuenta con una arquitectura escalable. Esto llevaría a una latencia en la visualización y procesamiento de datos en tiempo real, dificultando la detección de anomalías o problemas de rendimiento, lo que ralentizaría la toma de decisiones correctivas.
+
+    - **Dificultad para detectar patrones de fallo y rendimiento**: Sin una estructura de visualización consolidada y escalable, identificar patrones de fallo y rendimiento en distintos sistemas sería complicado. Esto afectaría la capacidad de análisis en el largo plazo retrasando la detección de problemas comunes y dificultando la implementación de soluciones preventivas.
+
+    - **Límites en la escalabilidad de la infraestructura de monitoreo**: Si no se considera una arquitectura de monitoreo robusta, el sistema podría alcanzar los límites de capacidad en cuanto a la cantidad de datos que puede manejar de múltiples sistemas. Esto impactaría en la calidad de la observabilidad y dificultaría su expansión a nuevos entornos, comprometiendo la continuidad del monitoreo a medida que el sistema crece.
