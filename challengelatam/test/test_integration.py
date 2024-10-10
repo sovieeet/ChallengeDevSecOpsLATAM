@@ -21,3 +21,8 @@ def test_api_exposes_data():
             datetime.fromisoformat(item["timestamp"])
         except ValueError:
             raise AssertionError(f"'timestamp' doesn't have a valid ISO format in item: {item}")
+
+    print("Test passed: The API is exposing data correctly and meets all conditions.")
+
+if __name__ == "__main__":
+    test_api_exposes_data()
