@@ -15,7 +15,6 @@ async def health_check():
 async def get_data():
     query = f"""
     SELECT * FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
-    LIMIT 10
     """
     query_job = client.query(query)
 
