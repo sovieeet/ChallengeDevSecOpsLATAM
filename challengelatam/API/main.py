@@ -5,12 +5,12 @@ PROJECT_ID = "pruebalatam-438117"
 DATASET_ID = "desafio_latam"
 TABLE_ID = "latam"
 
-print("Project ID:", PROJECT_ID)
-print("Dataset ID:", DATASET_ID)
-print("Table ID:", TABLE_ID)
-
 app = FastAPI()
 client = bigquery.Client(project=PROJECT_ID)
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 @app.get("/data")
 async def get_data():
