@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 
 def test_api_exposes_data():
-    url = "https://fastapi-app-213520764589.us-central1.run.app/data"
+    url = "https://desafio-latam-213520764589.us-central1.run.app/data"
 
     response = requests.get(url)
     
