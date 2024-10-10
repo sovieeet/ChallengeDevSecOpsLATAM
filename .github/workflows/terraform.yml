@@ -1,7 +1,15 @@
 name: Deploy_Terraform_To_GCP
 
 on:
-    - push
+    push:
+      branches:
+        - main
+        - develop
+        - feature/*
+
+concurrency:
+  group: "terraform-deployment"
+  cancel-in-progress: true
 
 jobs:
   deploy:
