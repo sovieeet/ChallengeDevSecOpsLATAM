@@ -63,49 +63,79 @@ Se agregaron otras pruebas como el *[test_health.py](challengelatam/test/test_he
 
 2. Otras pruebas de integración que se podrían aplicar incluyen:
 
-- **Prueba de respuesta sin datos en la tabla**: Esta prueba asegura que la API maneje correctamente los casos en los que la tabla de datos está vacía, sin generar errores inesperados. La API debería responder con un código 200 y un mensaje o un objeto vacío, indicando que no hay datos disponibles. Esto permite verificar la robustez de la API al enfrentarse a una base de datos sin registros.
+    - **Prueba de respuesta sin datos en la tabla**: Esta prueba asegura que la API maneje correctamente los casos en los que la tabla de datos está vacía, sin generar errores inesperados. La API debería responder con un código 200 y un mensaje o un objeto vacío, indicando que no hay datos disponibles. Esto permite verificar la robustez de la API al enfrentarse a una base de datos sin registros.
 
-- **Prueba con datos mal formateados**: Es posible que la base de datos reciba entradas con campos incompletos o con un formato inesperado. Una prueba de integración puede simular esta situación para verificar que la API maneja adecuadamente los errores de formato en lugar de interrumpir su servicio. Esta prueba implica agregar datos con errores en la tabla y observar que la API devuelva un mensaje de error informativo, sin interrumpir el flujo normal del servicio.
+    - **Prueba con datos mal formateados**: Es posible que la base de datos reciba entradas con campos incompletos o con un formato inesperado. Una prueba de integración puede simular esta situación para verificar que la API maneja adecuadamente los errores de formato en lugar de interrumpir su servicio. Esta prueba implica agregar datos con errores en la tabla y observar que la API devuelva un mensaje de error informativo, sin interrumpir el flujo normal del servicio.
 
-- **Prueba de integridad del formato de respuesta**: Para asegurar que el cliente siempre recibe el mismo formato de datos, esta prueba verifica que el esquema de los datos devueltos por la API se mantenga constante. Esto ayuda a que los usuarios de la API tengan una experiencia uniforme y evita fallos de compatibilidad con sistemas consumidores.
+    - **Prueba de integridad del formato de respuesta**: Para asegurar que el cliente siempre recibe el mismo formato de datos, esta prueba verifica que el esquema de los datos devueltos por la API se mantenga constante. Esto ayuda a que los usuarios de la API tengan una experiencia uniforme y evita fallos de compatibilidad con sistemas consumidores.
 
 3. Se podrían definir los siguiente puntos críticos del sistema a considerar:
 
-- **Sobrecarga de la API**: La API podría sobrecargarse si recibe muchas solicitudes simultáneas que podrían provocar que se ralentice o se bloquee.
+    - **Sobrecarga de la API**: La API podría sobrecargarse si recibe muchas solicitudes simultáneas que podrían provocar que se ralentice o se bloquee.
 
-- **Escalabilidad del Cloud Run y límites de recursos**: La API está desplegada en Cloud Run, lo que puede causar limitaciones de CPU y memoria que afecten su rendimiento y capacidad de respuesta en situaciones de alto tráfico. Esto se podría medir con el monitoreo de recursos en Cloud Run para medir el uso de CPU, memoria y tiempo de ejecución. Se podrían realizar pruebas de carga para validar que la API funciona bajo muchas solicitudes.
+    - **Escalabilidad del Cloud Run y límites de recursos**: La API está desplegada en Cloud Run, lo que puede causar limitaciones de CPU y memoria que afecten su rendimiento y capacidad de respuesta en situaciones de alto tráfico. Esto se podría medir con el monitoreo de recursos en Cloud Run para medir el uso de CPU, memoria y tiempo de ejecución. Se podrían realizar pruebas de carga para validar que la API funciona bajo muchas solicitudes.
 
-- **Sobreutilización o costo excesivo**: Si bien esto no corresponde especificamente a algo técnico del sistema, si la API o la función Pub/Sub son llamadas frecuentemente, podría haber un aumento significativo en los costos. Se podrían configurar alertas de presupuesto en GCP para recibir notificaciones si el costo excede el límite establecido. Simular un escenario de alto tráfico serviría estimar el costo y revisar si es posible optimizar el diseño o configuración para reducir gastos.
+    - **Sobreutilización o costo excesivo**: Si bien esto no corresponde especificamente a algo técnico del sistema, si la API o la función Pub/Sub son llamadas frecuentemente, podría haber un aumento significativo en los costos. Se podrían configurar alertas de presupuesto en GCP para recibir notificaciones si el costo excede el límite establecido. Simular un escenario de alto tráfico serviría estimar el costo y revisar si es posible optimizar el diseño o configuración para reducir gastos.
 
-- **Integridad de datos**: Si la Cloud Function que inserta datos en BigQuery falla, podría resultar en datos incompletos o corruptos, lo cual afecta el análisis. Pruebas de integración que verifiquen la integridad de los datos después de ser insertados podría ser una medida para esto, además de monitorear los logs de la Cloud Function para detectar errores.
+    - **Integridad de datos**: Si la Cloud Function que inserta datos en BigQuery falla, podría resultar en datos incompletos o corruptos, lo cual afecta el análisis. Pruebas de integración que verifiquen la integridad de los datos después de ser insertados podría ser una medida para esto, además de monitorear los logs de la Cloud Function para detectar errores.
 
-- **Autenticación y control de accesos**: Se podría añadir una autenticación mediante Bearer Tokens para que solo las cuentas autorizadas puedan acceder a la API, añadiendo una capa de seguridad. Se podrían configurar pruebas para simular el acceso con tokens válidos e inválidos, además de monitorear los logs de acceso.
+    - **Autenticación y control de accesos**: Se podría añadir una autenticación mediante Bearer Tokens para que solo las cuentas autorizadas puedan acceder a la API, añadiendo una capa de seguridad. Se podrían configurar pruebas para simular el acceso con tokens válidos e inválidos, además de monitorear los logs de acceso.
 
 4. Si bien en el punto anterior se abordaron las maneras de tratar, medir y testear los puntos críticos, acá se expandirá un poco más eso:
 
-- #### **Sobrecarga de la API**: 
-  - Si el tráfico aumenta considerablemente, se podría habilitar un balanceador de carga para distribuir las solicitudes entre varias instancias de la API, asegurando que no se sobrecargue una sola instancia.
+    - #### **Sobrecarga de la API**: 
+      - Si el tráfico aumenta considerablemente, se podría habilitar un balanceador de carga para distribuir las solicitudes entre varias instancias de la API, asegurando que no se sobrecargue una sola instancia.
 
-  - Aprovechar la función de escalado automático de Cloud Run para que bajo demanda se generen más instancias de la API y puedan atender mayor tráfico. Esto puede configurarse con límites para evitar costos excesivos.
+      - Aprovechar la función de escalado automático de Cloud Run para que bajo demanda se generen más instancias de la API y puedan atender mayor tráfico. Esto puede configurarse con límites para evitar costos excesivos.
 
-- #### **Escalabilidad y recursos en Cloud Run**:
-  - Ajustar los recursos asignados (CPU y memoria) en Cloud Run según el perfil de uso de la API. Realizar pruebas de rendimiento para encontrar la configuración ideal que minimice el uso sin sacrificar rendimiento.
+    - #### **Escalabilidad y recursos en Cloud Run**:
+      - Ajustar los recursos asignados (CPU y memoria) en Cloud Run según el perfil de uso de la API. Realizar pruebas de rendimiento para encontrar la configuración ideal que minimice el uso sin sacrificar rendimiento.
 
-  - Realizar pruebas de carga periódicas para identificar el punto de quiebre de la API y ajustar la configuración en consecuencia.
+      - Realizar pruebas de carga periódicas para identificar el punto de quiebre de la API y ajustar la configuración en consecuencia.
 
-  - Configurar límites de tiempo en las solicitudes para que las llamadas que demoren demasiado se terminen, liberando recursos para nuevas solicitudes y evitando bloqueos.
+      - Configurar límites de tiempo en las solicitudes para que las llamadas que demoren demasiado se terminen, liberando recursos para nuevas solicitudes y evitando bloqueos.
 
-- #### **Mitigación de costos**:
-  - Establecer un límite máximo de instancias para evitar un escalado excesivo y reducir costos.
+    - #### **Mitigación de costos**:
+      - Establecer un límite máximo de instancias para evitar un escalado excesivo y reducir costos.
 
-  - Usar técnicas como _batching_ en la Cloud Function para agrupar mensajes de Pub/Sub y hacer menos inserciones a BigQuery, lo cual reduciría el costo en operaciones de escritura.
+      - Usar técnicas como _batching_ en la Cloud Function para agrupar mensajes de Pub/Sub y hacer menos inserciones a BigQuery, lo cual reduciría el costo en operaciones de escritura.
 
-- #### **Integridad de datos en BigQuery**:
-  - Configurar mecanismos de reintento en la Cloud Function para manejar fallos intermitentes en la inserción de datos. Esto puede evitar que datos válidos se pierdan.
+    - #### **Integridad de datos en BigQuery**:
+      - Configurar mecanismos de reintento en la Cloud Function para manejar fallos intermitentes en la inserción de datos. Esto puede evitar que datos válidos se pierdan.
 
-  - Implementar validaciones adicionales en la Cloud Function para garantizar que solo datos válidos ingresen a BigQuery, evitando corrupción de datos.
+      - Implementar validaciones adicionales en la Cloud Function para garantizar que solo datos válidos ingresen a BigQuery, evitando corrupción de datos.
 
-  - Configurar backups automáticos de BigQuery.
+      - Configurar backups automáticos de BigQuery.
 
-- #### **Autenticación y control de accesos**:
-  - Implementar Bearer Tokens para autenticar y autorizar el acceso a la API. Configurar un sistema de autenticación con IAM para manejar accesos y permisos.
+    - #### **Autenticación y control de accesos**:
+      - Implementar Bearer Tokens para autenticar y autorizar el acceso a la API. Configurar un sistema de autenticación con IAM para manejar accesos y permisos.
+
+## 4. Métricas y Monitoreo
+
+1. Las tres métricas críticas propuestas para entender la salud y rendimiento del sistema end-to-end son:
+
+    - **Tiempo de respuesta de la API**: Esta métrica mide el tiempo que la API demora en responder cada solicitud, desde el momento en que se recibe hasta que devuelve la respuesta. Un aumento en este tiempo podría indicar problemas de rendimiento o carga en la API. Un tiempo de respuesta elevado perjudica la experiencia del usuario y puede ser una señal temprana de que los recursos están sobrecargados o que se necesita optimización.
+
+    - **Tasa de Errores en la Cloud Function**: Mide el porcentaje de ejecuciones de la Cloud Function que resultan en errores. Esto incluye fallos en la inserción de datos en BigQuery o en la decodificación de mensajes de Pub/Sub. Un aumento en esta métrica puede señalar que hay datos mal formateados, fallos intermitentes o configuraciones erróneas.
+
+    - **Número de Mensajes en Cola (Pub/Sub)**: Indica cuántos mensajes se encuentran en cola en Pub/Sub en espera de ser procesados por la Cloud Function. Si esta métrica crece constantemente, puede indicar que la Cloud Function no está procesando los mensajes con suficiente rapidez, lo cual podría causar retrasos en el procesamiento de datos y pérdida de mensajes.
+
+2. Debido a que se usa Google Cloud Platform, las opciones más viables serían Google Cloud Monitoring con Google Cloud Logging. Google Cloud Monitoring permite configurar dashboards que dan una vista en tiempo real de las métricas críticas del sistema, además de dividirlas por componentes en el sistema como el PubSub, Cloud Function y la API.
+
+    Las métricas claves para mostrar serían básicamente las señaladas en el punto 1:
+    - #### **Tiempo de respuesta de la API**:
+        - **Visualización**: Una gráfica de líneas que muestre el tiempo de respuesta promedio de la API a lo largo del tiempo, con puntos resaltados para valores extremos o tiempos de respuesta superiores al umbral establecido.
+
+        - **Decisiones estratégicas**: Si la tendencia muestra un aumento (aumenta el tiempo), se podría decidir optimizar el código, escalar los recursos de Cloud Run o ajustar el balanceador de carga. Esto ayuda a garantizar una experiencia de usuario fluida.
+
+    - #### **Tasa de Errores en la Cloud Function**:
+        - **Visualización**: Una gráfica de barras que indique el porcentaje de ejecuciones con error frente a las exitosas en intervalos de tiempo determinados.
+
+        - **Decisiones estratégicas**: Una tasa alta de errores podría significar problemas en la decodificación de mensajes o fallos en la inserción en BigQuery. Identificar rápidamente estos problemas permite implementar validaciones adicionales o reintentos automáticos en la Cloud Function para reducir errores futuros.
+
+    - #### **Número de Mensajes en Cola (Pub/Sub)**:
+        - **Visualización**: Una gráfica de área o líneas que muestre el número de mensajes en cola en Pub/Sub en tiempo real.
+
+        - **Decisiones estratégicas**: Si la cola crece constantemente, puede ser necesario escalar la Cloud Function para procesar los mensajes más rápido o ajustar el batching para manejar mejor los picos de tráfico.
+
+    Con estos paneles, se puede visualizar la salud general del sistema en tiempo real y recibir alertas en caso de que alguna métrica supere los umbrales críticos. Así podrían implementarse optimizaciones de costos o ajustes de recursos de manera anticipada, manteniendo la estabilidad y eficiencia del sistema.
