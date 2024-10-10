@@ -1,16 +1,7 @@
 name: Deploy Terraform to GCP
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - feature/*
-  pull_request:
-    branches:
-      - main
-      - develop
-  workflow_call: {}
+    - push
 
 jobs:
   terraform:
