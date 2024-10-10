@@ -1,10 +1,11 @@
 name: Deploy FastAPI to Cloud Run
 
 on:
-  workflow_run:
-    workflows: ["Deploy_Terraform_To_GCP"]
-    types:
-      - completed
+  - push
+  # workflow_run:
+  #   workflows: ["Deploy_Terraform_To_GCP"]
+  #   types:
+  #     - completed
 
 concurrency:
   group: "api-deployment"
