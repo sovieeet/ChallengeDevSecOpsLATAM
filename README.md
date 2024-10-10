@@ -181,3 +181,39 @@ Se agregaron otras pruebas como el *[test_health.py](challengelatam/test/test_he
     - **Dificultad para detectar patrones de fallo y rendimiento**: Sin una estructura de visualización consolidada y escalable, identificar patrones de fallo y rendimiento en distintos sistemas sería complicado. Esto afectaría la capacidad de análisis en el largo plazo retrasando la detección de problemas comunes y dificultando la implementación de soluciones preventivas.
 
     - **Límites en la escalabilidad de la infraestructura de monitoreo**: Si no se considera una arquitectura de monitoreo robusta, el sistema podría alcanzar los límites de capacidad en cuanto a la cantidad de datos que puede manejar de múltiples sistemas. Esto impactaría en la calidad de la observabilidad y dificultaría su expansión a nuevos entornos, comprometiendo la continuidad del monitoreo a medida que el sistema crece.
+
+## 5. Alertas y SRE
+
+1. Para las métricas propuestas, se establecerían umbrales que permitan detectar problemas de rendimiento y fallas en el sistema con rapidez, alertando al equipo a tiempo. Las reglas propuestas son:
+
+    - **Latencia de la API en Cloud Run**: Alertar si la latencia promedio en los últimos 5 minutos supera los 2 segundos (o los que se estime conveniente), ya que si la latencia de la API aumenta, podría significar sobrecarga de solicitudes, problemas de escalabilidad o recursos insuficientes.
+
+    - **Tasa de error de Cloud Function**: Alertar si la tasa de errores en la Cloud Function supera el 1% de las ejecuciones en un intervalo de tiempo. Una tasa de error mayor indica fallos en la ingesta de datos hacia BigQuery o en la manipulación de mensajes de Pub/Sub. Un umbral del 1% permite detectar problemas graves sin generar alertas por errores aislados.
+
+    - **Número de mensajes en cola de Pub/Sub**: Alertar si la cola de mensajes en Pub/Sub supera los 1000 mensajes sin procesar. Un gran número de mensajes en cola puede indicar que la Cloud Function no está procesando a la velocidad esperada o que existe un bottleneck en la ingesta de datos, lo cual puede llevar a una acumulación que afecte la operatividad y el flujo de datos en el sistema.
+
+2. Para asegurar la confiabilidad y el rendimiento del sistema, se proponen tres SLIs clave, cada uno con un SLO específico que abarcan los aspectos más críticos de la API, la Cloud Function y el flujo de mensajes en Pub/Sub. A continuación, se describen las métricas seleccionadas y las razones detrás de cada elección:
+
+    - **Disponibilidad de la API en Cloud Run**:
+
+        - **SLI**: Porcentaje de solicitudes a la API que responden con un código de estado 2xx en un período determinado.
+
+        - **SLO**: 99.5% de disponibilidad mensual.
+
+        - **Razón**: La disponibilidad mide si el sistema está accesible para los usuarios y responde correctamente a las solicitudes. Este SLI es crucial para garantizar la continuidad del servicio y un SLO de 99.5% asegura alta disponibilidad sin generar alertas excesivas por caídas menores o mantenimientos breves. Se descartaron métricas más amplias, como incluir todos los códigos de estado exitosos y de redirección, para centrarnos exclusivamente en las respuestas exitosas (2xx) que indican una operación completa y correcta.
+
+    - **Latencia de respuesta de la API en Cloud Run**:
+
+        - **SLI**: Tiempo promedio de respuesta de la API.
+
+        - **SLO**: Responder el 95% de las solicitudes en menos de 1.5 segundos.
+
+        - **Razón**: La latencia tiene un impacto directo en la experiencia del usuario y en el rendimiento percibido del sistema. Mantener una respuesta rápida evita que la API tenga un bottleneck. Un SLO que garantice que el 95% de las solicitudes respondan en menos de 1.5 segundos permite un balance entre rendimiento y eficiencia, con un margen para picos esporádicos. Se descartaron métricas de latencia más restrictivas para evitar alertas innecesarias en casos aislados de mayor tráfico o demanda.
+
+    - **Tasa de procesamiento de mensajes en Pub/Sub**:
+
+        - **SLI**: Porcentaje de mensajes procesados por la Cloud Function sin errores en un período determinado.
+
+        - **SLO**: 99% de mensajes procesados exitosamente cada semana.
+
+        - **Razón**: La capacidad de la Cloud Function para procesar mensajes correctamente es esencial para la ingesta de datos y su análisis. Este SLO asegura que el flujo de datos sea estable y que los errores en el procesamiento se mantengan en un nivel bajo. Elegimos un SLO semanal para reflejar la fiabilidad del procesamiento en función de cargas típicas, evitando alertas excesivas por fallos menores y temporales.
