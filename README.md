@@ -28,3 +28,7 @@ El flujo de datos se compone de la siguiente manera:
     - La función contiene validaciones para asegurar que el mensaje cumple con el formato requerido.
 4. La cloud function ingresa los datos a una tabla en BigQuery llamada `latam`, que contiene las columnas `id`, `name` y `timestamp`, almacenandose en tiempo real.
 5. Los datos se exponen mediante una API con la url `https://fastapi-app-213520764589.us-central1.run.app` en la cual usando un GET al endpoint `/data`, es posible obtener toda la información contenida en la tabla de BigQuery.
+
+El diagrama muestra el flujo de la data:
+
+![Diagrama del flujo de la data](challengelatam/assets/Diagram.png)
