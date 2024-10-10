@@ -1,9 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from google.cloud import bigquery
-
-PROJECT_ID = "pruebalatam-438117"
-DATASET_ID = "desafio_latam"
-TABLE_ID = "latam"
+from config.config import PROJECT_ID, DATASET_ID, TABLE_ID
 
 app = FastAPI()
 client = bigquery.Client(project=PROJECT_ID)
