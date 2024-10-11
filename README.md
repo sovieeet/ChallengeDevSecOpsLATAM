@@ -1,3 +1,5 @@
+Nota: se desactivó el proyecto para la prueba técnica, sin embargo, personalemnte encuentro que el trabajo está bueno así que lo dejo en mi repositorio.
+
 # Desafio Técnicos DevSecOps/SRE
  El desafio consiste en un sistema para ingestar y almacenar datos en una base de datos para analizarlos y luego deben ser expuestos por una API para que puedan ser consumidos.
 
